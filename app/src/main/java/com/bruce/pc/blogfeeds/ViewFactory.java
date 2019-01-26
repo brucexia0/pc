@@ -39,7 +39,7 @@ public class ViewFactory {
             viewGroup.addView(new FeedCardView(context), lp);
         }
         int padding = context.getResources().getDimensionPixelSize(R.dimen.padding) * 3;
-        viewGroup.setPadding(0, 0, padding, 0);
+        viewGroup.setPadding(0, 0, 0, padding);
         return viewGroup;
     }
 
