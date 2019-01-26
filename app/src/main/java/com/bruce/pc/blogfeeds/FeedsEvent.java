@@ -7,13 +7,13 @@ import java.util.List;
 
 public class FeedsEvent extends Event implements Cloneable {
     public static class NewFeedsEffect extends FeedsEvent {
-        private List<Feed> feeds;
+        private List<List<Feed>> feeds;
 
-        public NewFeedsEffect(List<Feed> feeds) {
+        public NewFeedsEffect(List<List<Feed>> feeds) {
             this.feeds = feeds;
         }
 
-        public List<Feed> getFeeds() {
+        public List<List<Feed>> getFeeds() {
             return feeds;
         }
     }

@@ -2,18 +2,23 @@ package com.bruce.pc.blogfeeds;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bruce.pc.MyApp;
 import com.bruce.pc.R;
 import com.bruce.pc.core.Logger;
+import com.bruce.pc.data.Feed;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -27,24 +32,43 @@ public class MainActivity extends AppCompatActivity {
         startStopDisposables.add(d);
     }
 
+    ViewFactory factory = new ViewFactory(this);
+    RecyclerView recyclerView;
+    FeedAdapter adapter;
+
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(BlogFeedsViewModel.class);
         ((MyApp) getApplication()).appComponent().inject(viewModel);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        LinearLayout rootView = new LinearLayout(this);
+        rootView.setOrientation(LinearLayout.VERTICAL);
+        swipeRefreshLayout = new SwipeRefreshLayout(this);
+//        Toolbar toolbar = new Toolbar(this);
+//        rootView.addView(toolbar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        rootView.addView(swipeRefreshLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        recyclerView = factory.newFeedsRecyclerView();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        swipeRefreshLayout.addView(recyclerView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(rootView);
+        getSupportActionBar().setTitle("Personal Capital");
+
+        adapter = new FeedAdapter(this, new FeedClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(int index, Feed feed) {
+                openFeed(feed);
             }
-        });
-        if (savedInstanceState != null) viewModel.onEvent(FeedsEvent.initialLoad);
+        }, getResources().getInteger(R.integer.columns));
+        recyclerView.setAdapter(adapter);
+        if (savedInstanceState == null) viewModel.onEvent(FeedsEvent.initialLoad);
+    }
+
+
+    private void openFeed(Feed feed) {
+        FeedActivity.openFeed(this, feed);
     }
 
     Logger logger = new Logger();
@@ -68,13 +92,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void render(BlogFeedsViewState state) {
-        logger.debug("show state " + state.toString(), null);
-        showTest("render");
-    }
-
-    private void showTest(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-
+        swipeRefreshLayout.setRefreshing(state.isLoading());
+        adapter.data = state.getFeeds();
+        adapter.notifyDataSetChanged();
     }
 
     @Override

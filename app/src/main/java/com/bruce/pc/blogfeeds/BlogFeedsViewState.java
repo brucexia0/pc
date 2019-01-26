@@ -3,14 +3,13 @@ package com.bruce.pc.blogfeeds;
 import com.bruce.pc.data.Feed;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class BlogFeedsViewState implements Cloneable {
     private boolean loading;
-    private List<Feed> feeds;
+    private List<List<Feed>> feeds;
 
-    public BlogFeedsViewState(boolean loading, List<Feed> feeds) {
+    public BlogFeedsViewState(boolean loading, List<List<Feed>> feeds) {
         this.loading = loading;
         this.feeds = feeds;
     }
@@ -23,11 +22,11 @@ public class BlogFeedsViewState implements Cloneable {
         this.loading = loading;
     }
 
-    public List<Feed> getFeeds() {
+    public List<List<Feed>> getFeeds() {
         return feeds;
     }
 
-    public void setFeeds(List<Feed> feeds) {
+    public void setFeeds(List<List<Feed>> feeds) {
         this.feeds = feeds;
     }
 
@@ -41,5 +40,10 @@ public class BlogFeedsViewState implements Cloneable {
 
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " feeds size " + ((feeds == null) ? 0 : feeds.size());
     }
 }
