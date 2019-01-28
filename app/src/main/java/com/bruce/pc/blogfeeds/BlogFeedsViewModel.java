@@ -1,7 +1,9 @@
 package com.bruce.pc.blogfeeds;
 
 import android.arch.lifecycle.ViewModel;
+import android.content.res.Resources;
 
+import com.bruce.pc.R;
 import com.bruce.pc.core.Logger;
 import com.bruce.pc.data.Api;
 import com.bruce.pc.data.Feed;
@@ -26,18 +28,20 @@ public class BlogFeedsViewModel extends ViewModel {
 
     public BlogFeedsViewModel() {
         super();
-        init();
     }
 
     @Inject
     Api api;
+    @Inject
+    Resources resources;
     private Observable<BlogFeedsViewState> viewState;
     private PublishRelay<Event> events = PublishRelay.create();
     private PublishRelay<Effect> effects = PublishRelay.create();
-
+    private int columns;
     private Logger logger = new Logger();
 
     void init() {
+        columns = resources.getInteger(R.integer.columns);
         Observable<Event> effectsHandler = effects.switchMap(effect -> effectToEvent(effect));
         viewState = Observable.merge(events, effectsHandler)
                 .doOnNext(event -> logger.debug("got event " + event.toString(), null))
@@ -88,7 +92,7 @@ public class BlogFeedsViewModel extends ViewModel {
         List<Feed> row = null;
         for (int i = 0; i < feeds.size(); i++) {
             Feed feed = feeds.get(i);
-            if (i == 0 || (i - 1) % 3 == 0) {
+            if (i == 0 || (i - 1) % columns == 0) {
                 row = new ArrayList<>();
                 result.add(row);
             }

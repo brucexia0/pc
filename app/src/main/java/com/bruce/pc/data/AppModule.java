@@ -1,20 +1,25 @@
 package com.bruce.pc.data;
 
-import com.bruce.pc.blogfeeds.BlogFeedsViewModel;
+import android.app.Application;
+import android.content.res.Resources;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Module
 public class AppModule {
+    @Provides
+    Resources resources(Application application) {
+        return application.getResources();
+    }
+
     @Provides
     ObjectMapper objectMapper() {
         return new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)

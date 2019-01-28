@@ -41,14 +41,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //This is hack, so I don't have to spend time on setting up dagger android or create viewmodel factory etc.
         viewModel = ViewModelProviders.of(this).get(BlogFeedsViewModel.class);
         ((MyApp) getApplication()).appComponent().inject(viewModel);
-
+        viewModel.init();
         LinearLayout rootView = new LinearLayout(this);
         rootView.setOrientation(LinearLayout.VERTICAL);
         swipeRefreshLayout = new SwipeRefreshLayout(this);
-//        Toolbar toolbar = new Toolbar(this);
-//        rootView.addView(toolbar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         rootView.addView(swipeRefreshLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView = factory.newFeedsRecyclerView();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
